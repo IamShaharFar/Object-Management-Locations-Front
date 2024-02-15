@@ -1,0 +1,12 @@
+.containerStyle {
+  width: "400px";
+  height: "400px";
+  margin: "0 auto";
+}
+
+.parentContainer {
+    display: flex;
+     justify-content: center; /*// Horizontally center the children */
+     align-items: center; /*// Vertically center the children */
+     height: 100vh; /*// Full height of the viewport */
+  }
