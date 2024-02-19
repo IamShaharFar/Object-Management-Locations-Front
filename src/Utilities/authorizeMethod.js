@@ -2,7 +2,7 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import axios from "axios";
 
-const withAuth = (WrappedComponent) => {
+export const withAuth = (WrappedComponent) => {
   return (props) => {
     // Check if userId exists in sessionStorage
     const isLoggedIn = sessionStorage.getItem("userId");
@@ -17,7 +17,7 @@ const withAuth = (WrappedComponent) => {
   };
 };
 
-const login = async (email, password) => {
+export const login = async (email, password) => {
   try {
     const response = await axios.get(
       `${process.env.REACT_APP_SERVER_URL}/auth/login`,
@@ -54,9 +54,9 @@ const login = async (email, password) => {
   }
 };
 
-const logout = () => {
+export const logout = () => {
   // Remove the userId from sessionStorage to "log out" the user
   sessionStorage.removeItem("userId");
   console.log("User logged out successfully");
 };
-export default withAuth;
+
