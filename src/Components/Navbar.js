@@ -25,9 +25,9 @@ export default function Navbar() {
         <CustomLink to="/contact">Contact</CustomLink>
         <CustomLink to="/addObject">Add Object</CustomLink>
         {isLoggedIn && (
-          <li>
-            <button onClick={handleLogoutClick}>Logout</button>
-          </li>
+          <li class="logout-button-container">
+          <button onClick={handleLogoutClick}>Logout</button>
+      </li>
         )}
       </ul>
     </nav>

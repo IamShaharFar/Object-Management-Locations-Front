@@ -9,62 +9,124 @@
 }
 
 .parentContainer {
-    display: flex;
-     justify-content: center; /*// Horizontally center the children */
-     align-items: center; /*// Vertically center the children */
-     height: 100vh; /*// Full height of the viewport */
-  }
+  display: flex;
+  justify-content: center;
+  /*// Horizontally center the children */
+  align-items: center;
+  /*// Vertically center the children */
+  height: 100vh;
+  /*// Full height of the viewport */
+}
 
-  
-  body {
-    margin: 0;
-  }
-  
-  .container {
-    margin: 1rem;
-    text-align: center;
-  }
-  
-  .nav {
-    background-color: #333;
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: stretch;
-    gap: 2rem;
-    padding: 0 1rem;
-  }
-  
-  .site-title {
-    font-size: 2rem;
-  }
-  
-  .nav ul {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-    display: flex;
-    gap: 1rem;
-  }
-  
-  .nav a {
-    color: inherit;
-    text-decoration: none;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    padding: .25rem;
-  }
-  
-  .nav li.active {
-    background-color: #555;
-  }
-  
-  .nav li:hover {
-    background-color: #777;
-  }
+.home-map-container{
+  margin-top: 20px;
+}
 
-  .objectTable {
+.select-dropdown {
+  padding: 10px 15px;
+  margin-right: 10px; /* Adjust spacing between elements */
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  color: #333;
+  background-color: #fff;
+}
+
+.start-button {
+  background-color: #4CAF50; /* Green */
+}
+
+.start-button:hover {
+  background-color: #45a049;
+}
+
+.stop-button {
+  background-color: #f44336; /* Red */
+}
+
+.stop-button:hover {
+  background-color: #da190b;
+}
+
+.push-out-button {
+  background-color: #2196F3; /* Blue */
+}
+
+.push-out-button:hover {
+  background-color: #0b7dda;
+}
+
+body {
+  margin: 0;
+}
+
+.container {
+  margin: 1rem;
+  text-align: center;
+}
+
+.nav {
+  background-color: #333;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 2rem;
+  padding: 0 1rem;
+}
+
+.site-title {
+  font-size: 2rem;
+}
+
+.nav ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+}
+
+.nav a {
+  color: white;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  padding: 10px 15px; /* Adjusted for uniform padding */
+  border-radius: 5px; /* Optional: if you want rounded corners */
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.logout-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.nav button {
+  background-color: #333; /* Matching the nav background color */
+  color: white;
+  border: none;
+  padding: 10px 15px; /* Consistent with .nav a */
+  cursor: pointer;
+  border-radius: 5px; /* Optional: if you want rounded corners */
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.nav button:hover {
+  background-color: #555; /* Darker shade on hover, similar to .nav a:hover */
+}
+
+.nav li.active {
+  background-color: #555;
+}
+
+.nav li:hover {
+  background-color: #777;
+}
+
+.objectTable {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
@@ -89,5 +151,5 @@
 }
 
 .objectTable tbody tr:hover {
-  background-color: #eae7f8;
+  background-color: #eae7f8;
 }

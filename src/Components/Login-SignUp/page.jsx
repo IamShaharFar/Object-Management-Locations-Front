@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
+import SocketContext from "../../contexts/SocketContext";
+import "./page.css";
 import {
   GoogleMap,
-  LoadScript,
+  LoadScriptNext,
   Marker,
   MarkerF,
   GoogleMapsMarkerClusterer,
@@ -10,10 +12,16 @@ import {
   CircleF,
 } from "@react-google-maps/api";
 
+const parentContainerStyle = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+};
+
 const containerStyle = {
-  width: "80vw",
+  width: "90vw",
   height: "80vh",
-  margin: "10 auto",
+  margin: "auto",
 };
 
 
@@ -28,6 +36,7 @@ function MyComponent() {
   const [objects, setObjects] = useState([]);
   const [center, setCenter] = useState({ lat: 32.0853, lng: 34.7818 });
   const [radius, setRadius] = useState(100);
+  const socket = useContext(SocketContext);
   const Locations = objects.filter(obj => obj.areaId === selectedAreaId);
 
   useEffect(() => {
@@ -50,15 +59,23 @@ function MyComponent() {
           const data = await response.json(); // Parse the JSON from the response
           console.log("data", data);
           setAreas(data); // Assuming the data is the array of areas
+
+          // Automatically select the first area if there are any areas
+          if (data && data.length > 0) {
+            const firstArea = data[0];
+            setSelectedAreaId(firstArea._id);
+            setCenter({ lat: firstArea.centerLat, lng: firstArea.centerLng });
+            setRadius(firstArea.radius);
+          }
         } catch (error) {
           console.error("Failed to fetch areas:", error);
         }
       }
     };
 
-
     fetchAreas();
   }, []);
+
 
   useEffect(() => {
     const fetchObjects = async () => {
@@ -87,6 +104,28 @@ function MyComponent() {
 
     fetchObjects();
   }, []);
+
+  useEffect(() => {
+    if (socket) {
+      const handleUserObjects = (data) => {
+        console.log("updated objects", data)
+        setObjects(data);
+      };
+
+      const handleObjectCrossed = (data) => {
+        console.log("objectCrossed - ", data)
+        alert("you have an object that crossed the polygon")
+      };
+
+      socket.on('userObjects', handleUserObjects);
+
+      socket.on('objectCrossed', handleObjectCrossed)
+
+      return () => {
+        socket.off('userObjects', handleUserObjects);
+      };
+    }
+  }, [socket]);
 
   const handleAreaChange = (event) => {
     const newSelectedAreaId = event.target.value;
@@ -154,7 +193,11 @@ function MyComponent() {
 
   return (
     <div>
-      <select value={selectedAreaId} onChange={handleAreaChange}>
+      <select
+        className="select-dropdown"
+        value={selectedAreaId}
+        onChange={handleAreaChange}
+      >
         <option value="">Select an Area</option>
         {areas.map((area) => (
           <option key={area._id} value={area._id}>
@@ -162,31 +205,34 @@ function MyComponent() {
           </option>
         ))}
       </select>
-      <button onClick={handleStart}>Start</button>
-      <button onClick={handleStop}>Stop</button>
-      <button onClick={handlePushOut}>Push Out</button>
-      <LoadScript
-        googleMapsApiKey="AIzaSyBmdzYhkMqzzxJ9PQFaLGXi9MugHsnhpTI" // My API key
-      >
-        <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={10}>
-          {Locations.map((location) => (
-            <MarkerF
-              key={location.id}
-              position={{ lat: location.lat, lng: location.lan }}
-            //title={location.title}
-            //icon={pinIcon} //custom icon no need for now
-            //onLoad={() => console.log("marker loaded", location)}
+      <button className="action-button start-button" onClick={handleStart}>Start</button>
+      <button className="action-button stop-button" onClick={handleStop}>Stop</button>
+      <button className="action-button push-out-button" onClick={handlePushOut}>Push Out</button>
+
+      <div className="home-map-container" style={parentContainerStyle}>
+        <LoadScriptNext
+          googleMapsApiKey="AIzaSyBmdzYhkMqzzxJ9PQFaLGXi9MugHsnhpTI" // My API key
+        >
+          <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={17}>
+            {Locations.map((location) => (
+              <MarkerF
+                key={location._id}
+                position={{ lat: location.lat, lng: location.lan }}
+              //title={location.title}
+              //icon={pinIcon} //custom icon no need for now
+              //onLoad={() => console.log("marker loaded", location)}
+              />
+            ))}
+            ;
+            <CircleF
+              // Defines the center and radius of the circle along with style options
+              center={circleOptions.center}
+              radius={circleOptions.radius}
+              options={circleOptions}
             />
-          ))}
-          ;
-          <CircleF
-            // Defines the center and radius of the circle along with style options
-            center={circleOptions.center}
-            radius={circleOptions.radius}
-            options={circleOptions}
-          />
-        </GoogleMap>
-      </LoadScript>
+          </GoogleMap>
+        </LoadScriptNext>
+      </div>
     </div>
   );
 }
