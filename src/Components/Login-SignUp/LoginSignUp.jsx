@@ -6,7 +6,39 @@ import email_icon from "../Assets/email.png";
 import password_icon from "../Assets/password.png";
 
 const LoginSignUp = () => {
-  const [action, SetAction] = useState("Sign Up");
+  const [action, setAction] = useState("Sign Up");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({ email: "", password: "" });
+
+  // Simple email regex for basic validation
+  const validateEmail = (email) => {
+    return /\S+@\S+\.\S+/.test(email);
+  };
+
+  // Check if the password meets your criteria (e.g., minimum 1 characters)
+  const validatePassword = (password) => {
+    return password.length >= 1;
+  };
+
+  // Handle form submission
+  const handleSubmit = () => {
+    let validationErrors = {};
+    if (!validateEmail(email)) {
+      validationErrors.email = "Invalid email format";
+    }
+    if (!validatePassword(password)) {
+      validationErrors.password = "Password must be at least 8 characters long";
+    }
+
+    setErrors(validationErrors);
+
+    // If no errors, proceed with submission (e.g., API call)
+    if (Object.keys(validationErrors).length === 0) {
+      console.log("Form is valid, proceed with submission");
+      // Here, you can add your logic to handle a valid form submission
+    }
+  };
 
   return (
     <div className="container">
@@ -19,18 +51,30 @@ const LoginSignUp = () => {
           <div></div>
         ) : (
           <div className="input">
-            <img src={user_icon} alt="" />
+            <img src={user_icon} alt="user icon" />
             <input type="text" placeholder="Name" />
           </div>
         )}
 
         <div className="input">
-          <img src={email_icon} alt="" />
-          <input type="email" placeholder="Email Id" />
+          <img src={email_icon} alt="email icon" />
+          <input
+            type="email"
+            placeholder="Email Id"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          {errors.email && <div className="error">{errors.email}</div>}
         </div>
         <div className="input">
-          <img src={password_icon} alt="" />
-          <input type="password" placeholder="Password" />
+          <img src={password_icon} alt="password icon" />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          {errors.password && <div className="error">{errors.password}</div>}
         </div>
       </div>
 
@@ -46,7 +90,7 @@ const LoginSignUp = () => {
         <div
           className={action === "Login" ? "submit grey" : "submit"}
           onClick={() => {
-            SetAction("Sign Up");
+            setAction("Sign Up");
           }}
         >
           Sign up
@@ -54,11 +98,14 @@ const LoginSignUp = () => {
         <div
           className={action === "Sign Up" ? "submit grey" : "submit"}
           onClick={() => {
-            SetAction("Login");
+            setAction("Login");
           }}
         >
           Login
         </div>
+        <button className="submit" onClick={handleSubmit}>
+          {action}
+        </button>
       </div>
     </div>
   );
