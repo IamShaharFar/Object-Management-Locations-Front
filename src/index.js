@@ -5,13 +5,28 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import "./styles.css";
 import { BrowserRouter } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import SocketProvider from './contexts/SocketProvider';
+import { useAuth } from "./contexts/AuthContext";
+
+const AppWithSocket = () => {
+  const { userId } = useAuth();
+
+  return (
+    <SocketProvider userId={userId}>
+      <App />
+    </SocketProvider>
+  );
+};
 
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <AuthProvider>
+        <AppWithSocket />
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

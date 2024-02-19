@@ -1,4 +1,4 @@
-import React,{useEffect,useState} from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
   GoogleMap,
@@ -16,30 +16,6 @@ const containerStyle = {
   margin: "10 auto",
 };
 
-const center = {
-  lat: 32.0853,
-  lng: 34.7818,
-};
-
-const circleOptions = {
-  strokeColor: "#008000", // A green color value for the circle's outline
-  strokeOpacity: 0.8, // The opacity of the circle's outline
-  strokeWeight: 2, // The weight of the circle's outline in pixels
-  fillColor: "#008000", // A green color value for the circle's fill
-  fillOpacity: 0.35, // The opacity of the circle's fill
-  center: center, // The center of the circle, which is the same as the map's center
-  radius: 100, // The radius of the circle in meters
-  clickable: true, // Whether the circle can be clicked or not
-};
-
-const Locations = [
-  { id: 1, title: "Location 1", lat: 32.0853, lng: 34.7818 },
-  { id: 2, title: "Location 2", lat: 32.086, lng: 34.7822 },
-  { id: 3, title: "Location 3", lat: 32.0854, lng: 34.7819 },
-  { id: 4, title: "Location 4", lat: 32.0855, lng: 34.781 },
-  { id: 5, title: "Location 5", lat: 32.0856, lng: 34.7823 },
-  { id: 6, title: "Location 6", lat: 32.0857, lng: 34.7824 },
-];
 
 function MyComponent() {
   const pinIcon = {
@@ -47,50 +23,174 @@ function MyComponent() {
     //scaledSize: new window.google.maps.Size(20, 20)
   };
 
+  const [areas, setAreas] = useState([]);
+  const [selectedAreaId, setSelectedAreaId] = useState("");
+  const [objects, setObjects] = useState([]);
+  const [center, setCenter] = useState({ lat: 32.0853, lng: 34.7818 });
+  const [radius, setRadius] = useState(100);
+  const Locations = objects.filter(obj => obj.areaId === selectedAreaId);
+
+  useEffect(() => {
+    const fetchAreas = async () => {
+      const userId = sessionStorage.getItem("userId");
+      if (userId) {
+        try {
+          const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/areas/fetchByUserId`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId: userId })
+          });
+
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+
+          const data = await response.json(); // Parse the JSON from the response
+          console.log("data", data);
+          setAreas(data); // Assuming the data is the array of areas
+        } catch (error) {
+          console.error("Failed to fetch areas:", error);
+        }
+      }
+    };
+
+
+    fetchAreas();
+  }, []);
+
+  useEffect(() => {
+    const fetchObjects = async () => {
+      const userId = sessionStorage.getItem("userId");
+      if (userId) {
+        try {
+          const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/objects/fetchByUserId`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId: userId })
+          });
+
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+
+          const data = await response.json();
+          setObjects(data); // Store the fetched objects
+        } catch (error) {
+          console.error("Failed to fetch objects:", error);
+        }
+      }
+    };
+
+    fetchObjects();
+  }, []);
+
+  const handleAreaChange = (event) => {
+    const newSelectedAreaId = event.target.value;
+    setSelectedAreaId(newSelectedAreaId);
+
+    const selectedArea = areas.find(area => area._id === newSelectedAreaId);
+    if (selectedArea) {
+      setCenter({ lat: selectedArea.centerLat, lng: selectedArea.centerLng });
+      setRadius(selectedArea.radius);
+    }
+
+    const filteredObjects = objects.filter(obj => obj.areaId === newSelectedAreaId);
+    console.log(filteredObjects);
+  };
+
+  const handleStart = () => {
+    axios.post(`${process.env.REACT_APP_SERVER_URL}/locations/start`)
+      .then(response => {
+        console.log("Start tracking", response.data);
+      })
+      .catch(error => {
+        console.error("Error starting location tracking", error);
+      });
+  };
+
+  const handleStop = () => {
+    axios.post(`${process.env.REACT_APP_SERVER_URL}/locations/stop`)
+      .then(response => {
+        console.log("Stop tracking", response.data);
+      })
+      .catch(error => {
+        console.error("Error stopping location tracking", error);
+      });
+  };
+
+  const handlePushOut = () => {
+    if (!selectedAreaId) {
+      alert("Please select an area first.");
+      return;
+    }
+
+    const tagId = objects.find(obj => obj.areaId === selectedAreaId).tagId
+
+    axios.post(`${process.env.REACT_APP_SERVER_URL}/locations/push`, {
+      tagId: tagId,
+    })
+      .then(response => {
+        console.log("Push out successful", response.data);
+      })
+      .catch(error => {
+        console.error("Error on push out", error);
+      });
+  };
+
+  const circleOptions = {
+    strokeColor: "#008000",
+    strokeOpacity: 0.8,
+    strokeWeight: 2,
+    fillColor: "#008000",
+    fillOpacity: 0.35,
+    center: center,
+    radius: radius,
+    clickable: true,
+  };
+
   return (
-    <LoadScript
-      googleMapsApiKey="AIzaSyBmdzYhkMqzzxJ9PQFaLGXi9MugHsnhpTI" // My API key
-    >
-      <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={10}>
-        {Locations.map((location) => (
-          <MarkerF
-            key={location.id}
-            position={{ lat: location.lat, lng: location.lng }}
+    <div>
+      <select value={selectedAreaId} onChange={handleAreaChange}>
+        <option value="">Select an Area</option>
+        {areas.map((area) => (
+          <option key={area._id} value={area._id}>
+            {area.name}
+          </option>
+        ))}
+      </select>
+      <button onClick={handleStart}>Start</button>
+      <button onClick={handleStop}>Stop</button>
+      <button onClick={handlePushOut}>Push Out</button>
+      <LoadScript
+        googleMapsApiKey="AIzaSyBmdzYhkMqzzxJ9PQFaLGXi9MugHsnhpTI" // My API key
+      >
+        <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={10}>
+          {Locations.map((location) => (
+            <MarkerF
+              key={location.id}
+              position={{ lat: location.lat, lng: location.lan }}
             //title={location.title}
             //icon={pinIcon} //custom icon no need for now
             //onLoad={() => console.log("marker loaded", location)}
+            />
+          ))}
+          ;
+          <CircleF
+            // Defines the center and radius of the circle along with style options
+            center={circleOptions.center}
+            radius={circleOptions.radius}
+            options={circleOptions}
           />
-        ))}
-        ;
-        <CircleF
-          // Defines the center and radius of the circle along with style options
-          center={circleOptions.center}
-          radius={circleOptions.radius}
-          options={circleOptions}
-        />
-      </GoogleMap>
-    </LoadScript>
+        </GoogleMap>
+      </LoadScript>
+    </div>
   );
 }
 
 export default MyComponent;
 
-////////////////////////////centering of all the pins/////////////////
-// function getCenterFromLocations(locations) {
-//   let lat = 0;
-//   let lng = 0;
 
-//   locations.forEach((location) => {
-//     lat += location.lat;
-//     lng += location.lng;
-//   });
-
-//   lat /= locations.length;
-//   lng /= locations.length;
-
-//   return { lat, lng };
-// }
-
-// // ...
-
-// const center = getCenterFromLocations(Locations);

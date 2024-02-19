@@ -17,7 +17,7 @@ export const withAuth = (WrappedComponent) => {
   };
 };
 
-export const login = async (email, password) => {
+export const login = async (email, password, setUserId) => {
   try {
     console.log("login", email, password);
     console.log(process.env.REACT_APP_SERVER_URL);
@@ -39,10 +39,14 @@ export const login = async (email, password) => {
 
     // If the request is successful, store the userId in sessionStorage
     if (response.status === 200) {
-      sessionStorage.setItem("userId", data.userId); // Use data.userId instead of response.data.userId
+      sessionStorage.setItem("userId", data.userId);
+      setUserId(data.userId); 
       console.log("Login successful:", data.message);
+      return true;
     } else {
+      alert("wrong credentials, please try again!")
       console.error("Login failed:", data.message);
+      return false;
     }
 
   } catch (error) {
@@ -51,9 +55,10 @@ export const login = async (email, password) => {
 };
 
 
-export const logout = () => {
+export const logout = (setUserId) => {
   // Remove the userId from sessionStorage to "log out" the user
   sessionStorage.removeItem("userId");
+  setUserId(null);
   console.log("User logged out successfully");
 };
 
