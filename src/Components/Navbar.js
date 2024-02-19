@@ -1,7 +1,21 @@
 import { Link, useMatch, useResolvedPath } from "react-router-dom";
 import CatchIt from "./Assets/CatchIt.png";
+import { logout } from "../Utilities/authorizeMethod";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Navbar() {
+
+  const { setUserId } = useAuth();
+  const navigate = useNavigate();
+
+  const isLoggedIn = sessionStorage.getItem("userId") !== null;
+
+  const handleLogoutClick = () => {
+    logout(setUserId);
+    navigate('/login');
+  };
+
   return (
     <nav className="nav">
       <img src={CatchIt} alt="Logo" height="50px" width="100px" />
@@ -10,6 +24,11 @@ export default function Navbar() {
         <CustomLink to="/myObjects">MyObjects</CustomLink>
         <CustomLink to="/contact">Contact</CustomLink>
         <CustomLink to="/addObject">Add Object</CustomLink>
+        {isLoggedIn && (
+          <li>
+            <button onClick={handleLogoutClick}>Logout</button>
+          </li>
+        )}
       </ul>
     </nav>
   );

@@ -1,13 +1,20 @@
 import React, { useState } from "react";
 import { login } from "../../Utilities/authorizeMethod";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from '../../contexts/AuthContext';
 import "./LoginComponent.css";
 
 const LoginComponent = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { setUserId } = useAuth();
+  const navigate = useNavigate();
 
-  const handleClick = () => {
-    login(email, password);
+  const handleClick = async () => {
+    const loginSuccess = await login(email, password, setUserId);
+    if (loginSuccess) {
+      navigate('/');
+    }
   };
 
   return (

@@ -1,6 +1,5 @@
 import logo from "./logo.svg";
 import "./App.css";
-// import LoginSignUp from "./Components/Login-SignUp/LoginSignUp";
 import Login from "./Components/Login-SignUp/LoginComponent.jsx";
 import SignUp from "./Components/Login-SignUp/SignUpComponent.jsx";
 import MyComponent from "./Components/Login-SignUp/page.jsx";
@@ -9,20 +8,21 @@ import MyObject from "./Components/Login-SignUp/MyObjects.jsx";
 import Contact from "./Components/Login-SignUp/Contact.jsx";
 import AddObject from "./Components/Login-SignUp/AddObject.jsx";
 import { Route, Routes } from "react-router-dom";
-// import { Login } from "@mui/icons-material";
-// import LoginSignUp from "./Components/Assets/Login-SignUp/LoginSignUp";
+import { withAuth } from "./Utilities/authorizeMethod.js";
+
 function App() {
+  const AuthHome = withAuth(MyComponent)
+  const AuthMyObjects = withAuth(MyObject)
   return (
     <div>
-      <Login />
-      <SignUp />
-      {/* <LoginSignUp /> */}
       <>
         <Navbar />
         <div className="container">
           <Routes>
-            <Route path="/" element={<MyComponent />} />
-            <Route path="/myobjects" element={<MyObject />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/" element={<AuthHome/>} />
+            <Route path="/myobjects" element={<AuthMyObjects />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/addObject" element={<AddObject />} />
           </Routes>
