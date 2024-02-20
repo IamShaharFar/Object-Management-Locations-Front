@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { GoogleMap, LoadScriptNext, MarkerF } from "@react-google-maps/api";
+import { GoogleMap, LoadScriptNext, MarkerF, CircleF } from "@react-google-maps/api";
 import "./AddObject.css";
 
 const parentContainerStyle = {
@@ -22,14 +22,8 @@ function AddObjectForm() {
   const [areas, setAreas] = useState([]);
   const [selectedAreaId, setSelectedAreaId] = useState("");
   const [description, setDescription] = useState("");
-  const [selectedOption, setSelectedOption] = useState("");
-  const [location, setLocation] = useState({ lat: 32.0853, lng: 34.7818 }); // Default location is Tel Aviv
+    const [location, setLocation] = useState({ lat: 32.0853, lng: 34.7818 }); // Default location is Tel Aviv
 
-  const options = [
-    { id: 1, name: "Option 1" },
-    { id: 2, name: "Option 2" },
-    { id: 3, name: "Option 3" },
-  ];
 
   useEffect(() => {
     const fetchAreas = async () => {
@@ -78,7 +72,7 @@ function AddObjectForm() {
     if (!description.trim()) {
       alert("Please enter a description for the object.");
       return; // Exit the function early if no description
-  }
+    }
 
     const objectData = {
       description,
@@ -113,6 +107,7 @@ function AddObjectForm() {
     }
   };
 
+ 
   return (
     <div className="signup-container">
       <form className="signup-form" onSubmit={handleSubmit}>
@@ -154,9 +149,9 @@ function AddObjectForm() {
           <label htmlFor="combo-box">Choose an Area:</label>
           <select
             id="combo-box"
-            value={selectedOption}
-            placeholder="Choose an Option"
-            onChange={(e) => setSelectedOption(e.target.value)}
+            value={selectedAreaId}
+            placeholder="Choose an Area"
+            onChange={(e) => setSelectedAreaId(e.target.value)}
             className="signup-input"
           >
             {areas.map((area) => (
